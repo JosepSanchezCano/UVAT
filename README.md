@@ -1,12 +1,13 @@
-# [UVAT]
+# UVAT
 Josep Sánchez, Jose-Luis LISANI
+University of the Balearic Islands
 
 [Paper (pending)]
 
 The Underwater Video Annotation Tool (UVAT) is an open source tool that greatly improves the time needed to annotate video data. This repository contains the code for the tool to work in Linux and Windows systems.
 
 
-![overview](https://imgur.com/a/wLOs1vK)
+![Flux diagram showing the most common workflow](https://github.com/[JosepSanchezCano]/[UVAT]/blob/[main]/flux.png?raw=true)
 
 Demo video
 
