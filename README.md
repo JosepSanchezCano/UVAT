@@ -11,6 +11,9 @@ The Underwater Video Annotation Tool (UVAT) is an open source tool that greatly 
 
 Demo video
 
+<video src="https://youtu.be/z9UPyx-g7Gg" ></video>
+
+
 ## Installation
 
 To install the tool some instruction for the Ubuntu command lines will be given
