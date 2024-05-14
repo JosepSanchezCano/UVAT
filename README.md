@@ -1,4 +1,4 @@
-# UVAT
+# Open Source Video Annotation Tool for Underwater Scenes: UVAT
 Josep Sánchez, Jose-Luis LISANI
 University of the Balearic Islands
 
