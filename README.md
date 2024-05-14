@@ -11,7 +11,10 @@ The Underwater Video Annotation Tool (UVAT) is an open source tool that greatly 
 
 Demo video
 
-https://github.com/JosepSanchezCano/UVAT/assets/152962791/e143c964-e852-4ccd-a735-1e8c653bc564
+
+
+https://github.com/JosepSanchezCano/UVAT/assets/152962791/9275e2c0-3b44-40ab-9eee-f96212e86fed
+
 
 ## Installation
 
