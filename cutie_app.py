@@ -5,7 +5,7 @@ import hydra
 from hydra.core.hydra_config import HydraConfig
 from omegaconf import open_dict
 from hydra import compose, initialize
-
+import gc
 import torch
 from torch.utils.data import DataLoader
 import numpy as np
@@ -96,42 +96,43 @@ class Cutie:
         frames_propagated = 0
 
         first_frame = True
-        with torch.cuda.amp.autocast(enabled=True):
+        with torch.inference_mode():
+            with torch.cuda.amp.autocast(enabled=True):
 
-            while self.current_frame_index < self.max_frames and frames_propagated < self.max_propagation_frames:
-                frame = frames[self.current_frame_index]
+                while self.current_frame_index < self.max_frames and frames_propagated < self.max_propagation_frames:
+                    frame = frames[self.current_frame_index]
 
-                print(f"frame: {self.current_frame_index}")
-                aux_frame = frame
- #<               aux_frame = cv2.resize(frame,(1280,720), interpolation=cv2.INTER_NEAREST_EXACT)
-                #print(image_to_torch(aux_frame, device=DEVICE))
-                frame_torch= image_to_torch(aux_frame, device=DEVICE)
+                    print(f"frame: {self.current_frame_index}")
+                    aux_frame = frame
+    #<               aux_frame = cv2.resize(frame,(1280,720), interpolation=cv2.INTER_NEAREST_EXACT)
+                    #print(image_to_torch(aux_frame, device=DEVICE))
+                    frame_torch= image_to_torch(aux_frame, device=DEVICE)
 
-                #print(frame)
-                if first_frame:
-                    mask_torch = index_numpy_to_one_hot_torch(mask_aux, num_obj +1).to(DEVICE)
+                    #print(frame)
+                    if first_frame:
+                        mask_torch = index_numpy_to_one_hot_torch(mask_aux, num_obj +1).to(DEVICE)
 
-                    prediction = processor.step(frame_torch, mask_torch[1:], idx_mask = False)
-                    first_frame = False
-                else:
-                    print(f"Mem info: {torch.cuda.mem_get_info()}")
-                    prediction = processor.step(frame_torch)
+                        prediction = processor.step(frame_torch, mask_torch[1:], idx_mask = False)
+                        first_frame = False
+                    else:
+                        print(f"Mem info: {torch.cuda.mem_get_info()}")
+                        prediction = processor.step(frame_torch)
 
-                prediction = torch_prob_to_numpy_mask(prediction)
-                
-#                prediction = cv2.resize(prediction,(width,height),interpolation=cv2.INTER_NEAREST_EXACT)
-                # cv2.imshow("ventana",prediction*255)
-                # cv2.waitKey(0)
+                    prediction = torch_prob_to_numpy_mask(prediction)
+                    
+    #                prediction = cv2.resize(prediction,(width,height),interpolation=cv2.INTER_NEAREST_EXACT)
+                    # cv2.imshow("ventana",prediction*255)
+                    # cv2.waitKey(0)
 
-#                print(prediction)
-                #print(np.unique(prediction))
-                masks.append(prediction)    
+    #                print(prediction)
+                    #print(np.unique(prediction))
+                    masks.append(prediction)    
 
-                self.current_frame_index += 1
-                frames_propagated += 1
+                    self.current_frame_index += 1
+                    frames_propagated += 1
 
-                #torch.cuda.empty_cache()
-                #gc.collect()
+                    torch.cuda.empty_cache()
+                    gc.collect()
             #print(masks)
         
         return masks

@@ -1,7 +1,7 @@
 import numpy as np
 from ultralytics import SAM
 import cv2
-from xmem import Xmem
+# from xmem import Xmem
 from cutie_app import Cutie
 import torch
 import itertools
@@ -268,7 +268,7 @@ class Yolopred():
         if load:
             self.loadModel()
 
-    def loadModel(self, path = "yolo_pesos/bbox.pt"):
+    def loadModel(self, path = "weights/bbox.pt"):
         self.model = YOLO(path)
         #print(f"El modelo es: {self.model}")
 
