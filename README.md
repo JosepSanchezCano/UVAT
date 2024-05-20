@@ -33,7 +33,7 @@ cd UVAT
 conda create --name UVAT --file requirements.txt
 ```
 
-To be able to run the application is needed to download the weights from : link
+To be able to run the application is needed to download the weights from : https://uibes-my.sharepoint.com/:f:/g/personal/jsc250_id_uib_eu/EoFxHyDu_wlLuW3FI3iL3vYBs0hpk205rb2QXuBxy5FZFQ?e=heg5Tz
 
 It is enough to drop the folder inside the repository
 
