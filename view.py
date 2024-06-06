@@ -6,9 +6,10 @@ import cv2
 import numpy as np
 import random
 from PIL import ImageColor
+import gc
 from videoplayer import Videoplayer
 from enum import Enum
-
+from memory_profiler import profile 
 GRAPH_WIDTH = 1280
 GRAPH_HEIGHT = 768
 PLAY_SPEED = 0.133
@@ -55,10 +56,11 @@ class Vista:
         self.drag = False
         self.temporal_mask = []
 
+        self.figures_ids = []
     def _getButtonLayout(self):
         layout = [
             [sg.Button("<-- Past frame"), sg.Button("Apply SAM"),sg.Button("Apply Yolo"),sg.Button("Apply SAM full"), sg.Button("Next frame -->"),sg.Button("Change Mode"),sg.Button("Foreground"),sg.Button("Background")],
-            [sg.Button("Propagate"),sg.Button("Backward"),sg.Button("Stop"),sg.Button("Play Forward"),sg.Button("Show Mask"),sg.Button("Clear selection"),sg.Button("Clear Frame"),sg.Button("Clear"),sg.Button("Zoom In"),sg.Button("Zoom Out"), sg.Slider(range=(0,100), default_value= 1, enable_events = True, orientation="horizontal", key="-SL-"),sg.Exit()]
+            [sg.Button("Propagate"),sg.Button("Backwards Propagate"),sg.Button("Backward"),sg.Button("Stop"),sg.Button("Play Forward"),sg.Button("Show Mask"),sg.Button("Clear selection"),sg.Button("Clear Frame"),sg.Button("Clear"),sg.Button("Zoom In"),sg.Button("Zoom Out"), sg.Slider(range=(0,100), default_value= 1, enable_events = True, orientation="horizontal", key="-SL-"),sg.Exit()]
         ]
 
         return(layout)
@@ -182,7 +184,14 @@ class Vista:
         height, width, channels = results.shape
 
         graph = self._window["-GRAPH-"]
-        graph.draw_image(data=data, location=(0,height))
+        #graph.erase()
+        id = graph.draw_image(data=data, location=(0,height))
+        self.figures_ids.append(id)
+        print(self.figures_ids)
+        if len(self.figures_ids) > 1:
+            graph.delete_figure(self.figures_ids[0])
+            self.figures_ids.pop(0)
+        gc.collect()
         
         #image = self._window["-IMAGE-"]
         #image.update(data=cv2.imencode('.ppm',frame)[1].tobytes())
@@ -326,18 +335,21 @@ class Vista:
             elif event == "Propagate":
                 self._controller.propagate()
                 self._controller._showFrame()
+            elif event == "Backwards Propagate":
+                self._controller.backwards_propagate()
+                self._controller._showFrame()
             elif event == "Show Mask":
                 self.show_mask = not self.show_mask
                 self._showFrame(self._controller._showFrame())
             elif event == "Play Forward":
                 
                 if self.videoplayer:
-                    self.videoplayer._run()
+                    self.videoplayer.start()
             elif event == "Backward":
                 
                 if self.videoplayer:
                     self.videoplayer.change_forward()
-                    self.videoplayer._run()
+                    self.videoplayer.start()
             elif event == "Stop":
                 if self.videoplayer:
                     self.videoplayer.stop()

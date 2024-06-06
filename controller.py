@@ -59,6 +59,9 @@ class Controller:
     def propagate(self):
         self.model.propagate()
 
+    def backwards_propagate(self):
+        self.model.backwards_propagate()
+
     def selectMask(self, point):
         self.model.selectMask(point)
 

@@ -1,6 +1,7 @@
 import numpy as np
 from ultralytics import SAM
 import cv2
+from memory_profiler import profile 
 # from xmem import Xmem
 from cutie_app import Cutie
 import torch
@@ -70,8 +71,11 @@ class Video:
             for file in frames_paths:
                 frame = cv2.imread(file)
                 frames.append(frame)
-                #retinex.append(RetinexFunctions.MSRetinex())
-                # retinex.append(RetinexFunctions.MSRetinex())
+
+                ret = msretinex.mainRetinex(frame)
+                print(f"the retinex image is: {ret}")
+                retinex.append(ret)
+                # retinex.append(msretinex.mainRetinex(frame))
             
         else:
 
@@ -81,6 +85,10 @@ class Video:
                 if not read:
                     break
                 frames.append(frame)
+                
+                # ret = msretinex.mainRetinex(frame)
+                #print(f"the retinex image is: {ret}")
+                # retinex.append(ret)
             
         self.frames = frames
         self._setNFrames()
@@ -98,6 +106,7 @@ class Video:
     Desc: Función getter que devuelve el frame actual
     """
     def _getCurrentFrame(self):
+        gc.collect()
         return self.frames[self.currentFrame]
     
     """
@@ -106,6 +115,7 @@ class Video:
     return: None
     """
     def _setFrame(self, nextFrame=True):
+        gc.collect()
         if nextFrame and ((self.currentFrame + 1) < self.nframes):
             self.currentFrame += 1
         elif (self.currentFrame - 1) >= 0:
@@ -445,8 +455,17 @@ class Model:
             self.adaptMasks(temp_masks)
             self.fixAllMasks()
 
+    def backwards_propagate(self):
+        #print(f"masks:\n{self.masks[self.video._getCurrentFrameNumber()][0].getMask()}")
+        num_obj, mask = self.applyMaskAndFormatXmem()
+        if num_obj != -1:
+            self.xmem.setNumObj(num_obj)
+            temp_masks = self.xmem.backwards_propagate(self.video.getFrames(),mask, num_obj,self.video._getCurrentFrameNumber())
+            self.adaptMasks(temp_masks, is_backwards = True)
+            self.fixAllMasks()
+
     #Función que corta las máscaras obtenidas del modelo XMEM
-    def cutMasks(self, temp_masks):
+    def cutMasks(self, temp_masks, is_backwards = False):
         masks = dict()
         key = self.video._getCurrentFrameNumber()
 
@@ -465,13 +484,17 @@ class Model:
                     new_mask_obj = Mask(new_mask,i)
                     masks[key].append(new_mask_obj)
 
-            key += 1
+            if is_backwards:
+                key -= 1 
+            else:
+                key += 1
+
         return masks
         
     #Función que adapta las máscaras obtenidas por los métodos XMEM 
-    def adaptMasks(self, temp_masks):
+    def adaptMasks(self, temp_masks, is_backwards = False):
 
-        all_masks = self.cutMasks(temp_masks)
+        all_masks = self.cutMasks(temp_masks, is_backwards)
 
         for key, masks in all_masks.items():
 
