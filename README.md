@@ -37,9 +37,3 @@ To be able to run the application is needed to download the weights from : link
 
 It is enough to drop the folder inside the repository
 
-To execute the tool we use the following command line instruction:
-
-```bash
-python3 view.py
-```
-
