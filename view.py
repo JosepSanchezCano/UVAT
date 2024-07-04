@@ -14,6 +14,8 @@ GRAPH_WIDTH = 1280
 GRAPH_HEIGHT = 768
 PLAY_SPEED = 0.133
 
+#Checking if git is correctly uploading the view file
+CONST_VOID = -1
 
 class Modo(Enum):
     NoneClickable = 0
