@@ -37,3 +37,11 @@ To be able to run the application is needed to download the weights from : link
 
 It is enough to drop the folder inside the repository
 
+## Things to be aware of
+
+- The pySimpleGUI version should 4.60.0, the newer ones present issues with updating the frames shown in the screen.
+- The RAM used in this version of the program is not optimized as there is not a buffer system to load the videos. You may need huge amounts of RAM for long videos.
+- We recommend to use 60Hz display as the GUI library does not support high refresh monitors.
+- Using shorter videos (2 min) is preferable to avoid issues with python not handling well the amounts of RAM required for some of the tasks of the annotator
+- A web version is on the works, so until the web version is finished this version won't have bigger updates
+
